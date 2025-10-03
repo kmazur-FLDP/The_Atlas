@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "name": "The Atlas",
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "typescript.suggest.includeCompletionsForImportStatements": true,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "*.ts": "$(capture).test.ts, $(capture).spec.ts",
+      "*.tsx": "$(capture).test.tsx, $(capture).spec.tsx",
+      "*.js": "$(capture).test.js, $(capture).spec.js",
+      "*.jsx": "$(capture).test.jsx, $(capture).spec.jsx",
+    },
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.vscode-typescript-next",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "bradlc.vscode-tailwindcss",
+      "formulahendry.auto-rename-tag",
+      "christian-kohler.path-intellisense",
+      "ms-playwright.playwright",
+    ],
+  },
+}
