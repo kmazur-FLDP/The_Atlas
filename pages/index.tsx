@@ -1,7 +1,36 @@
+import { useAuth } from '@/contexts/AuthContext'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 const Home: NextPage = () => {
+  const { isAuthenticated, loading } = useAuth()
+  const router = useRouter()
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/auth/login')
+    }
+  }, [isAuthenticated, loading, router])
+
+  // Show loading while checking auth or redirecting
+  if (loading || !isAuthenticated) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
+          <p className='text-slate-600'>
+            {loading ? 'Loading...' : 'Redirecting to login...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show welcome page for authenticated users
   return (
     <div>
       <Head>
@@ -25,18 +54,18 @@ const Home: NextPage = () => {
             </p>
 
             <div className='space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center'>
-              <a
-                href='/auth/login'
+              <Link
+                href='/dashboard'
                 className='inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors'
               >
-                Login
-              </a>
-              <a
-                href='/dashboard'
+                Go to Dashboard
+              </Link>
+              <Link
+                href='/auth/logout'
                 className='inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors'
               >
-                View Dashboard
-              </a>
+                Sign Out
+              </Link>
             </div>
           </div>
 
