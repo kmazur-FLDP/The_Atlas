@@ -2,8 +2,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const Home: NextPage = () => {
   const { isAuthenticated, loading } = useAuth()

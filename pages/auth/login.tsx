@@ -35,7 +35,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      const redirectTo = router.query.redirect as string || '/dashboard'
+      const redirectTo = (router.query.redirect as string) || '/dashboard'
       router.push(redirectTo)
     }
   }, [isAuthenticated, authLoading, router])
@@ -86,7 +86,7 @@ export default function LoginPage() {
         setErrors({ general: result.error })
       } else {
         // Redirect to intended page or dashboard
-        const redirectTo = router.query.redirect as string || '/dashboard'
+        const redirectTo = (router.query.redirect as string) || '/dashboard'
         router.push(redirectTo)
       }
     } catch (error) {

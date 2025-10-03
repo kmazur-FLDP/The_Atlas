@@ -22,7 +22,7 @@ export function ProtectedRoute({
   useEffect(() => {
     if (shouldRedirect) {
       const currentPath = router.asPath
-      const loginUrl = redirectTo.includes('?') 
+      const loginUrl = redirectTo.includes('?')
         ? `${redirectTo}&redirect=${encodeURIComponent(currentPath)}`
         : `${redirectTo}?redirect=${encodeURIComponent(currentPath)}`
       router.push(loginUrl)
