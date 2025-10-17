@@ -14,7 +14,16 @@ export function ProtectedRoute({
   redirectTo = '/auth/login',
 }: ProtectedRouteProps) {
   const router = useRouter()
-  const { isAuthenticated, isAdmin, loading } = useAuth()
+  const { isAuthenticated, isAdmin, loading, user } = useAuth()
+
+  console.log('🔐 ProtectedRoute Check:', {
+    requireAdmin,
+    isAuthenticated,
+    isAdmin,
+    loading,
+    userId: user?.id,
+    userEmail: user?.email,
+  })
 
   const shouldRedirect =
     !loading && (!isAuthenticated || (requireAdmin && !isAdmin))
@@ -43,6 +52,12 @@ export function ProtectedRoute({
 
   // Show unauthorized message for admin-only routes
   if (requireAdmin && isAuthenticated && !isAdmin) {
+    console.log('❌ ACCESS DENIED: User is authenticated but not admin', {
+      isAuthenticated,
+      isAdmin,
+      userId: user?.id,
+    })
+
     return (
       <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
         <div className='text-center max-w-md mx-auto p-6'>
@@ -54,12 +69,24 @@ export function ProtectedRoute({
               You don&apos;t have permission to access this page. Administrator
               privileges are required.
             </p>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors'
-            >
-              Go to Dashboard
-            </button>
+            <div className='text-xs text-red-600 bg-red-100 p-2 rounded mb-4 font-mono'>
+              Debug: User ID: {user?.id || 'none'} | Email:{' '}
+              {user?.email || 'none'} | isAdmin: {String(isAdmin)}
+            </div>
+            <div className='space-y-2'>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors w-full'
+              >
+                Go to Dashboard
+              </button>
+              <button
+                onClick={() => router.push('/debug-auth')}
+                className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors w-full'
+              >
+                Debug Auth Status
+              </button>
+            </div>
           </div>
         </div>
       </div>

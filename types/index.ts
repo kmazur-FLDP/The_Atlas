@@ -3,6 +3,7 @@ export interface User {
   id: string
   email: string
   company_id: string
+  is_admin: boolean
   created_at: string
   company?: Company
 }
@@ -30,6 +31,7 @@ export interface Map {
   description?: string
   thumbnail_url?: string
   sort_order: number
+  is_active: boolean
   created_at: string
   project?: Project
 }
@@ -50,6 +52,7 @@ export interface UploadedFile {
   filename: string
   storage_path: string
   file_type: string
+  file_size?: number
   uploaded_by: string
   created_at: string
   project?: Project

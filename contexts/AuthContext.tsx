@@ -39,15 +39,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
   const [isAdminUser, setIsAdminUser] = useState(false)
 
-  const refreshProfile = async () => {
-    if (user?.id) {
-      const userProfile = await getUserProfile(user.id)
+  const refreshProfile = async (userId?: string) => {
+    const targetUserId = userId || user?.id
+
+    if (targetUserId) {
+      console.log('🔄 Refreshing profile for user:', targetUserId)
+
+      const userProfile = await getUserProfile(targetUserId)
       setProfile(userProfile)
+      console.log('📝 Profile set:', userProfile)
 
       // Check admin status
-      const adminStatus = await isAdmin(user.id)
+      const adminStatus = await isAdmin(targetUserId)
+      console.log('🔐 Admin status result:', adminStatus)
       setIsAdminUser(adminStatus)
     } else {
+      console.log('❌ No user ID, clearing profile')
       setProfile(null)
       setIsAdminUser(false)
     }
@@ -79,7 +86,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(initialUser)
 
         if (initialUser?.id) {
-          await refreshProfile()
+          // Pass the user ID directly to avoid race condition
+          const userProfile = await getUserProfile(initialUser.id)
+          setProfile(userProfile)
+          console.log('📝 Profile set:', userProfile)
+
+          const adminStatus = await isAdmin(initialUser.id)
+          console.log('🔐 Admin status result:', adminStatus)
+          setIsAdminUser(adminStatus)
         }
       } catch (error) {
         // Handle error silently
@@ -98,7 +112,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(session?.user ?? null)
 
       if (session?.user?.id) {
-        await refreshProfile()
+        // Pass the user ID directly to avoid race condition
+        const userProfile = await getUserProfile(session.user.id)
+        setProfile(userProfile)
+        console.log('📝 Profile set in auth change:', userProfile)
+
+        const adminStatus = await isAdmin(session.user.id)
+        console.log('🔐 Admin status result in auth change:', adminStatus)
+        setIsAdminUser(adminStatus)
       } else {
         setProfile(null)
         setIsAdminUser(false)

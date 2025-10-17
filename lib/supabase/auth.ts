@@ -144,6 +144,8 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
  */
 export async function getUserProfile(userId: string): Promise<User | null> {
   try {
+    console.log('👤 Fetching user profile for:', userId)
+
     const { data, error } = await supabase
       .from('users')
       .select(
@@ -156,13 +158,19 @@ export async function getUserProfile(userId: string): Promise<User | null> {
       .single()
 
     if (error) {
-      console.error('Error fetching user profile:', error)
+      console.error('❌ Error fetching user profile:', error)
       return null
     }
 
+    console.log('✅ User profile fetched:', {
+      email: data?.email,
+      is_admin: data?.is_admin,
+      company_id: data?.company_id,
+    })
+
     return data
   } catch (error) {
-    console.error('Error fetching user profile:', error)
+    console.error('💥 Error fetching user profile:', error)
     return null
   }
 }
@@ -246,26 +254,30 @@ export function onAuthStateChange(
  */
 export async function isAdmin(userId: string): Promise<boolean> {
   try {
+    console.log('🔍 Checking admin status for user:', userId)
+
     const { data, error } = await supabase
       .from('users')
-      .select('email')
+      .select('is_admin')
       .eq('id', userId)
       .single()
 
+    console.log('📊 Admin check response:', { data, error })
+
     if (error || !data) {
+      console.log(
+        '❌ Admin check failed:',
+        error?.message || 'No data returned'
+      )
       return false
     }
 
-    // Add your admin email logic here
-    // For now, you can hardcode admin emails or add an admin role to the database
-    const adminEmails = [
-      'admin@yourdomain.com',
-      // Add your admin emails here
-    ]
+    const adminStatus = data.is_admin === true
+    console.log('✅ Admin status:', adminStatus)
 
-    return adminEmails.includes(data.email)
+    return adminStatus
   } catch (error) {
-    console.error('Error checking admin status:', error)
+    console.error('💥 Error checking admin status:', error)
     return false
   }
 }
