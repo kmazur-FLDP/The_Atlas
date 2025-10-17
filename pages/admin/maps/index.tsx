@@ -2,14 +2,14 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
-import { getAllMaps, deleteMap, toggleMapStatus } from '@/lib/supabase/maps'
+import { deleteMap, getAllMaps, toggleMapStatus } from '@/lib/supabase/maps'
 import { getAllProjects } from '@/lib/supabase/projects'
 import type { Map, Project } from '@/types'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Switch } from '@/components/ui/switch'
 
 function MapsContent() {
   const [maps, setMaps] = useState<Map[]>([])

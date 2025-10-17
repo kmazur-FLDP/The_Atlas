@@ -17,6 +17,18 @@ module.exports = {
     },
     extend: {
       colors: {
+        // Brand colors from FLDP logo
+        brand: {
+          primary: '#0a3d62', // Deep navy blue
+          'primary-dark': '#082d47',
+          'primary-light': '#1a5080',
+          secondary: '#e67e22', // Orange accent
+          'secondary-dark': '#d35400',
+          'secondary-light': '#f39c12',
+          accent: '#3498db', // Bright blue
+          'accent-dark': '#2980b9',
+          'accent-light': '#5dade2',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
