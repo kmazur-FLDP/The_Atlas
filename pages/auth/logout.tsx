@@ -28,10 +28,15 @@ export default function LogoutPage() {
         <title>Logging out - The Atlas</title>
       </Head>
 
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-slate-600'>Signing you out...</p>
+      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary via-brand-primary-light to-brand-accent'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]' />
+        <div className='absolute right-16 top-[-10%] h-60 w-60 rounded-full bg-white/15 blur-3xl' />
+        <div className='absolute bottom-[-25%] left-[-8%] h-72 w-72 rounded-full bg-white/12 blur-3xl' />
+        <div className='relative text-center text-white'>
+          <div className='mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/30 border-t-transparent'></div>
+          <p className='text-sm tracking-wide uppercase text-white/80'>
+            Signing you out...
+          </p>
         </div>
       </div>
     </>

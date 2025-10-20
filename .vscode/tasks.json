@@ -23,8 +23,11 @@
         "owner": "nextjs",
         "pattern": [
           {
-            "regexp": "^(.*)$",
-            "file": 1
+            "regexp": "^\\s*(.+):(\\d+):(\\d+):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "message": 4
           }
         ],
         "background": {

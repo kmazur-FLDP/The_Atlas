@@ -16,15 +16,6 @@ export function ProtectedRoute({
   const router = useRouter()
   const { isAuthenticated, isAdmin, loading, user } = useAuth()
 
-  console.log('🔐 ProtectedRoute Check:', {
-    requireAdmin,
-    isAuthenticated,
-    isAdmin,
-    loading,
-    userId: user?.id,
-    userEmail: user?.email,
-  })
-
   const shouldRedirect =
     !loading && (!isAuthenticated || (requireAdmin && !isAdmin))
 
@@ -41,10 +32,15 @@ export function ProtectedRoute({
   // Show loading spinner while checking authentication
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-slate-600'>Loading...</p>
+      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary via-brand-primary-light to-brand-accent'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]' />
+        <div className='absolute -right-20 top-10 h-60 w-60 rounded-full bg-white/15 blur-3xl' />
+        <div className='absolute bottom-[-25%] left-10 h-72 w-72 rounded-full bg-white/12 blur-3xl' />
+        <div className='relative text-center text-white'>
+          <div className='mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/30 border-t-transparent'></div>
+          <p className='text-sm tracking-wide uppercase text-white/80'>
+            Loading...
+          </p>
         </div>
       </div>
     )
@@ -52,39 +48,35 @@ export function ProtectedRoute({
 
   // Show unauthorized message for admin-only routes
   if (requireAdmin && isAuthenticated && !isAdmin) {
-    console.log('❌ ACCESS DENIED: User is authenticated but not admin', {
-      isAuthenticated,
-      isAdmin,
-      userId: user?.id,
-    })
-
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
-        <div className='text-center max-w-md mx-auto p-6'>
-          <div className='bg-red-50 border border-red-200 rounded-lg p-6'>
-            <h1 className='text-xl font-semibold text-red-800 mb-2'>
-              Access Denied
+      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary via-brand-primary-light to-brand-accent'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]' />
+        <div className='absolute right-20 top-[-10%] h-64 w-64 rounded-full bg-white/15 blur-3xl' />
+        <div className='absolute bottom-[-25%] left-[-10%] h-80 w-80 rounded-full bg-white/12 blur-3xl' />
+        <div className='relative w-full max-w-lg px-6'>
+          <div className='rounded-3xl border border-white/30 bg-white/80 p-8 text-center shadow-[0_35px_65px_rgba(10,61,98,0.25)] backdrop-blur-xl'>
+            <h1 className='text-2xl font-semibold text-brand-primary mb-3'>
+              Access restricted
             </h1>
-            <p className='text-red-700 mb-4'>
-              You don&apos;t have permission to access this page. Administrator
-              privileges are required.
+            <p className='text-sm text-slate-600 mb-4'>
+              You need administrator privileges to open this workspace panel.
             </p>
-            <div className='text-xs text-red-600 bg-red-100 p-2 rounded mb-4 font-mono'>
+            <div className='text-xs text-slate-500 bg-white/70 border border-white/40 rounded-2xl p-3 mb-6 font-mono'>
               Debug: User ID: {user?.id || 'none'} | Email:{' '}
               {user?.email || 'none'} | isAdmin: {String(isAdmin)}
             </div>
-            <div className='space-y-2'>
+            <div className='grid gap-3'>
               <button
                 onClick={() => router.push('/dashboard')}
-                className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors w-full'
+                className='rounded-full bg-brand-primary px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-primary/30 transition hover:bg-brand-primary-dark'
               >
-                Go to Dashboard
+                Return to dashboard
               </button>
               <button
                 onClick={() => router.push('/debug-auth')}
-                className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors w-full'
+                className='rounded-full border border-brand-accent/40 bg-white px-5 py-3 text-sm font-semibold text-brand-accent transition hover:border-brand-accent hover:bg-brand-accent/10'
               >
-                Debug Auth Status
+                Debug authentication
               </button>
             </div>
           </div>
@@ -96,10 +88,15 @@ export function ProtectedRoute({
   // Redirect if not authenticated (this will happen via useEffect)
   if (shouldRedirect) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-slate-600'>Redirecting...</p>
+      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary via-brand-primary-light to-brand-accent'>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_60%)]' />
+        <div className='absolute -right-16 top-24 h-56 w-56 rounded-full bg-white/15 blur-3xl' />
+        <div className='absolute bottom-[-22%] left-16 h-64 w-64 rounded-full bg-white/12 blur-3xl' />
+        <div className='relative text-center text-white'>
+          <div className='mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/30 border-t-transparent'></div>
+          <p className='text-sm tracking-wide uppercase text-white/80'>
+            Redirecting...
+          </p>
         </div>
       </div>
     )

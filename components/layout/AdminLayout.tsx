@@ -145,16 +145,22 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className='min-h-screen bg-slate-50'>
+    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-primary/5 via-white to-brand-accent/10'>
+      <div className='pointer-events-none absolute inset-0'>
+        <div className='absolute -left-32 top-28 h-96 w-96 rounded-full bg-brand-primary/15 blur-3xl' />
+        <div className='absolute right-[-8%] top-0 h-80 w-80 rounded-full bg-brand-accent/14 blur-3xl' />
+        <div className='absolute bottom-[-20%] left-1/3 h-[28rem] w-[28rem] rounded-full bg-brand-secondary/16 blur-3xl' />
+      </div>
+
       {/* Top Navigation Bar */}
-      <nav className='sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm'>
+      <nav className='sticky top-0 z-50 overflow-hidden border-b border-white/30 bg-gradient-to-r from-brand-primary via-brand-primary-light to-brand-accent text-white shadow-[0_25px_60px_rgba(10,61,98,0.3)]'>
         <div className='px-4 sm:px-6 lg:px-8'>
-          <div className='flex justify-between h-16'>
+          <div className='flex h-16 items-center justify-between'>
             <div className='flex items-center gap-4'>
               {/* Mobile menu button */}
               <button
                 type='button'
-                className='inline-flex items-center justify-center p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 lg:hidden'
+                className='inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 p-2 text-white transition hover:bg-white/20 lg:hidden'
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <svg
@@ -174,23 +180,30 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
               {/* Logo */}
               <Link href='/dashboard' className='flex items-center'>
-                <Image
-                  src='/images/fldp_final_color.png'
-                  alt='FLDP Logo'
-                  width={140}
-                  height={35}
-                  className='h-9 w-auto'
-                  priority
-                />
+                <span className='sr-only'>The Atlas</span>
+                <div className='flex items-center rounded-2xl border border-white/30 bg-white/90 px-4 py-2 shadow-lg shadow-brand-primary/25'>
+                  <Image
+                    src='/images/fldp_final_color.png'
+                    alt='FLDP Logo'
+                    width={200}
+                    height={50}
+                    className='h-12 w-auto'
+                    priority
+                  />
+                </div>
               </Link>
-              <div className='hidden md:flex items-center px-3 py-1 bg-brand-primary/10 text-brand-primary text-xs font-semibold rounded-full'>
-                Admin Panel
+              <div className='hidden md:flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 backdrop-blur'>
+                Admin Console
               </div>
             </div>
 
-            <div className='flex items-center gap-3'>
+            <div className='flex items-center gap-3 text-sm text-white/80'>
               <Link href='/dashboard'>
-                <Button variant='ghost' size='sm' className='text-slate-600'>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='rounded-full border border-white/30 bg-white/10 px-4 text-white transition hover:bg-white/20'
+                >
                   <svg
                     className='w-4 h-4 mr-2'
                     fill='none'
@@ -207,17 +220,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <span className='hidden sm:inline'>Dashboard</span>
                 </Button>
               </Link>
-              <div className='hidden md:flex items-center gap-2 text-sm text-slate-600 border-l border-slate-200 pl-3'>
-                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-white font-semibold text-xs'>
+              <div className='hidden border-l border-white/30 pl-4 md:flex items-center gap-2'>
+                <div className='flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-primary font-semibold text-sm shadow-inner'>
                   {user?.email?.[0]?.toUpperCase() || 'A'}
                 </div>
-                <span className='max-w-[150px] truncate'>{user?.email}</span>
+                <span className='max-w-[150px] truncate text-white'>
+                  {user?.email}
+                </span>
               </div>
               <Button
-                variant='outline'
                 size='sm'
                 onClick={handleSignOut}
-                className='text-slate-700 hover:text-slate-900'
+                className='rounded-full bg-white/90 px-4 text-brand-primary transition hover:bg-white'
               >
                 <span className='hidden sm:inline'>Sign Out</span>
                 <svg
@@ -242,16 +256,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className='flex'>
         {/* Desktop Sidebar */}
         <aside className='hidden lg:flex lg:flex-shrink-0'>
-          <div className='flex flex-col w-64 border-r border-slate-200 bg-white'>
-            <nav className='flex-1 px-4 py-6 space-y-1'>
+          <div className='flex w-72 flex-col border-r border-white/40 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_rgba(10,61,98,0.18)]'>
+            <nav className='flex-1 space-y-1 px-5 py-6'>
               {navigation.map(item => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                  className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all ${
                     isActive(item.href)
-                      ? 'bg-brand-primary text-white shadow-sm'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-brand-primary'
+                      ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/30'
+                      : 'text-slate-600 hover:bg-white/60 hover:text-brand-primary'
                   }`}
                 >
                   <span
@@ -263,7 +277,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     {item.icon}
                   </span>
-                  <span className='ml-3'>{item.name}</span>
+                  <span>{item.name}</span>
                 </Link>
               ))}
             </nav>
@@ -274,17 +288,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         {sidebarOpen && (
           <div className='fixed inset-0 z-40 lg:hidden'>
             <div
-              className='fixed inset-0 bg-slate-900/50'
+              className='fixed inset-0 bg-brand-primary/60 backdrop-blur-sm'
               onClick={() => setSidebarOpen(false)}
             />
-            <div className='fixed inset-y-0 left-0 flex flex-col w-64 bg-white border-r border-slate-200'>
-              <div className='flex items-center justify-between h-16 px-4 border-b border-slate-200'>
-                <span className='text-lg font-semibold text-slate-900'>
+            <div className='fixed inset-y-0 left-0 flex w-72 flex-col border-r border-white/30 bg-white/80 backdrop-blur-xl'>
+              <div className='flex h-16 items-center justify-between border-b border-white/30 px-5'>
+                <span className='text-lg font-semibold text-brand-primary'>
                   Admin Menu
                 </span>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className='p-2 rounded-md text-slate-600 hover:bg-slate-100'
+                  className='rounded-full border border-white/40 bg-white/20 p-2 text-slate-600 hover:bg-white/40'
                 >
                   <svg
                     className='h-6 w-6'
@@ -301,15 +315,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </svg>
                 </button>
               </div>
-              <nav className='flex-1 px-4 py-6 space-y-1 overflow-y-auto'>
+              <nav className='flex-1 space-y-1 overflow-y-auto px-5 py-6'>
                 {navigation.map(item => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                    className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all ${
                       isActive(item.href)
-                        ? 'bg-brand-primary text-white shadow-sm'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-brand-primary'
+                        ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/30'
+                        : 'text-slate-600 hover:bg-white/60 hover:text-brand-primary'
                     }`}
                     onClick={() => setSidebarOpen(false)}
                   >
@@ -331,8 +345,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         )}
 
         {/* Main Content Area */}
-        <main className='flex-1 overflow-auto'>
-          <div className='px-4 py-8 sm:px-6 lg:px-8'>
+        <main className='relative z-10 flex-1 overflow-auto'>
+          <div className='px-4 py-10 sm:px-6 lg:px-8'>
             <div className='mx-auto max-w-7xl'>{children}</div>
           </div>
         </main>

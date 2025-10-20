@@ -33,31 +33,43 @@ export function Header() {
   ].filter(item => item.show)
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80'>
-      <nav className='mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8'>
+    <header className='sticky top-0 z-50 w-full overflow-hidden border-b border-white/20 bg-transparent'>
+      <div className='absolute inset-0 bg-gradient-to-r from-brand-primary via-brand-primary-light to-brand-accent' />
+      <div className='absolute inset-0 opacity-80 backdrop-blur-xl' />
+      <div className='absolute inset-0 pointer-events-none'>
+        <div className='absolute -left-24 top-6 h-48 w-48 rounded-full bg-white/15 blur-3xl' />
+        <div className='absolute right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-2xl' />
+      </div>
+
+      <nav className='relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8'>
         {/* Logo */}
-        <div className='flex lg:flex-1'>
+        <div className='flex items-center gap-6 lg:flex-1'>
           <Link
             href={isAuthenticated ? '/dashboard' : '/'}
-            className='-m-1.5 p-1.5'
+            className='flex items-center'
           >
-            <span className='sr-only'>FLDP Atlas</span>
-            <Image
-              src='/images/fldp_final_color.png'
-              alt='FLDP Logo'
-              width={160}
-              height={40}
-              className='h-10 w-auto'
-              priority
-            />
+            <span className='sr-only'>The Atlas</span>
+            <div className='flex items-center rounded-2xl border border-white/30 bg-white/90 px-4 py-2 shadow-lg shadow-brand-primary/20'>
+              <Image
+                src='/images/fldp_final_color.png'
+                alt='FLDP Logo'
+                width={220}
+                height={60}
+                className='h-14 w-auto'
+                priority
+              />
+            </div>
           </Link>
+          <span className='hidden text-sm font-semibold uppercase tracking-[0.3em] text-white/70 lg:inline'>
+            The Atlas
+          </span>
         </div>
 
         {/* Mobile menu button */}
         <div className='flex lg:hidden'>
           <button
             type='button'
-            className='-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-slate-700 hover:bg-slate-100'
+            className='inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 p-2.5 text-white transition hover:bg-white/20'
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <span className='sr-only'>Open main menu</span>
@@ -94,73 +106,92 @@ export function Header() {
         </div>
 
         {/* Desktop navigation */}
-        <div className='hidden lg:flex lg:gap-x-8'>
-          {navigation.map(item => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`text-sm font-semibold leading-6 transition-colors ${
-                router.pathname.startsWith(item.href)
-                  ? 'text-brand-primary'
-                  : 'text-slate-700 hover:text-brand-primary'
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+        <div className='hidden lg:flex lg:items-center lg:gap-x-4'>
+          <div className='flex items-center gap-2 rounded-full border border-white/20 bg-white/10 p-1 shadow-lg shadow-brand-primary/20 backdrop-blur'>
+            {navigation.map(item => {
+              const isActive = router.pathname.startsWith(item.href)
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`group relative rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-white text-brand-primary'
+                      : 'text-white/80 hover:bg-white/10'
+                  }`}
+                >
+                  <span className='flex items-center gap-2'>
+                    {item.name}
+                    {isActive && (
+                      <span className='h-1 w-1 rounded-full bg-brand-primary' />
+                    )}
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
 
         {/* User actions */}
         <div className='hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4'>
           {isAuthenticated ? (
             <>
-              <div className='flex items-center gap-x-2 text-sm text-slate-600'>
-                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary font-semibold text-xs'>
+              <div className='flex items-center gap-x-3 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white shadow-lg shadow-brand-primary/20 backdrop-blur'>
+                <div className='flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-primary font-semibold text-sm shadow-inner'>
                   {initials}
                 </div>
-                <span className='hidden xl:inline'>{displayName}</span>
+                <div className='flex flex-col leading-tight'>
+                  <span className='font-semibold text-white'>
+                    {displayName}
+                  </span>
+                  <span className='text-xs text-white/60'>{user?.email}</span>
+                </div>
               </div>
               <Button
                 onClick={handleSignOut}
-                variant='ghost'
                 size='sm'
-                className='text-slate-700 hover:text-slate-900'
+                className='rounded-full bg-white/90 px-5 text-brand-primary transition hover:bg-white'
               >
                 Sign out
               </Button>
             </>
           ) : (
-            <>
+            <div className='flex items-center gap-2'>
               <Link href='/auth/login'>
-                <Button variant='ghost' size='sm'>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='rounded-full border border-white/30 bg-white/10 px-5 text-white transition hover:bg-white/20'
+                >
                   Log in
                 </Button>
               </Link>
               <Link href='/auth/signup'>
                 <Button
                   size='sm'
-                  className='bg-brand-primary hover:bg-brand-primary-dark'
+                  className='rounded-full bg-white px-5 text-brand-primary shadow-lg shadow-brand-primary/20 hover:bg-white'
                 >
                   Sign up
                 </Button>
               </Link>
-            </>
+            </div>
           )}
         </div>
       </nav>
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className='lg:hidden'>
-          <div className='space-y-1 border-t border-slate-200 px-6 pb-3 pt-2'>
+        <div className='relative border-t border-white/20 bg-white/10 backdrop-blur-lg lg:hidden'>
+          <div className='space-y-1 px-6 pb-6 pt-4'>
             {navigation.map(item => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`block rounded-md px-3 py-2 text-base font-semibold ${
+                className={`block rounded-xl px-4 py-3 text-base font-medium transition-all ${
                   router.pathname.startsWith(item.href)
-                    ? 'bg-brand-primary/10 text-brand-primary'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-white text-brand-primary shadow-md'
+                    : 'text-white/80 hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -168,26 +199,23 @@ export function Header() {
               </Link>
             ))}
             {isAuthenticated && (
-              <div className='border-t border-slate-200 pt-3 mt-3'>
-                <div className='flex items-center gap-x-3 px-3 py-2 text-sm text-slate-600'>
-                  <div className='flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary font-semibold text-sm'>
+              <div className='mt-4 space-y-3 rounded-xl border border-white/20 bg-white/5 p-4 text-white'>
+                <div className='flex items-center gap-3'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-full bg-white text-brand-primary font-semibold text-base shadow-inner'>
                     {initials}
                   </div>
                   <div className='flex flex-col'>
-                    <span className='font-medium text-slate-900'>
-                      {displayName}
-                    </span>
-                    <span className='text-xs text-slate-500'>
-                      {user?.email}
-                    </span>
+                    <span className='font-semibold'>{displayName}</span>
+                    <span className='text-sm text-white/70'>{user?.email}</span>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={handleSignOut}
-                  className='w-full text-left px-3 py-2 text-base font-semibold text-slate-700 hover:bg-slate-100 rounded-md'
+                  variant='ghost'
+                  className='w-full rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20'
                 >
                   Sign out
-                </button>
+                </Button>
               </div>
             )}
           </div>

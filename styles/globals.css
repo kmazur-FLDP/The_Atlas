@@ -1,26 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 210 40% 98%;
+    --foreground: 222.2 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2 47% 11%;
 
-    --popover: 0 0% 100%;
+    --popover: 210 40% 99%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 207 91% 21%; /* Brand navy */
+    --primary: 205 91% 25%; /* Brand navy */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 28 80% 52%; /* Brand orange */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 95%;
+    --muted-foreground: 215.4 16.3% 42%;
 
     --accent: 204 70% 53%; /* Brand bright blue */
     --accent-foreground: 0 0% 100%;
@@ -28,25 +30,25 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 207 91% 21%;
+    --border: 215 32% 90%;
+    --input: 215 30% 92%;
+    --ring: 205 91% 25%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 222.2 84% 5%;
+    --foreground: 210 40% 96%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 222.2 84% 7%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 222.2 84% 7%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 210 60% 65%;
+    --primary-foreground: 222.2 84% 9%;
 
     --secondary: 28 80% 52%;
     --secondary-foreground: 0 0% 100%;
@@ -71,7 +73,32 @@
     @apply border-border;
   }
   body {
-    @apply bg-slate-50 text-foreground;
+    font-family:
+      'Plus Jakarta Sans',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+    @apply text-foreground antialiased;
+    background-image:
+      radial-gradient(
+        circle at top left,
+        rgba(10, 61, 98, 0.18),
+        transparent 52%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(52, 152, 219, 0.16),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 15% 85%,
+        rgba(230, 126, 34, 0.16),
+        transparent 50%
+      ),
+      linear-gradient(180deg, #f9fbff 0%, #eef3ff 48%, #fff9f3 100%);
+    background-attachment: fixed;
   }
 }
 
@@ -119,6 +146,46 @@ html {
   @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
 }
 
+/* Glass + glow utilities */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-brand-primary/10;
+}
+
+.glass-panel-dark {
+  @apply bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl shadow-brand-primary/20;
+}
+
+.glow-ring {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 25px 50px -12px rgba(10, 61, 98, 0.3);
+}
+
+.text-gradient-brand {
+  @apply bg-gradient-to-r from-brand-primary via-brand-accent to-brand-secondary bg-clip-text text-transparent;
+}
+
+.gridlines-overlay {
+  position: relative;
+}
+
+.gridlines-overlay::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.4),
+    transparent 70%
+  );
+  opacity: 0.4;
+}
+
 /* Focus visible styles for accessibility */
 *:focus-visible {
   @apply outline-none ring-2 ring-brand-primary ring-offset-2;
@@ -134,6 +201,3 @@ html {
 }
 
 /* Text gradient */
-.text-gradient-brand {
-  @apply bg-gradient-to-r from-brand-primary to-brand-accent bg-clip-text text-transparent;
-}
