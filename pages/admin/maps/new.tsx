@@ -13,9 +13,10 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase/client'
+import { getAllSharedLayers, createMapLayers } from '@/lib/supabase/layers'
 import { createMap } from '@/lib/supabase/maps'
 import { getAllProjects } from '@/lib/supabase/projects'
-import type { Project } from '@/types'
+import type { Project, SharedLayer } from '@/types'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -34,6 +35,10 @@ function NewMapContentEnhanced() {
   const router = useRouter()
   const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
+  const [sharedLayers, setSharedLayers] = useState<SharedLayer[]>([])
+  const [selectedSharedLayers, setSelectedSharedLayers] = useState<Set<string>>(
+    new Set()
+  )
   const [loading, setLoading] = useState(false)
   const [mapType, setMapType] = useState<MapType>('iframe')
   const [dataLayers, setDataLayers] = useState<DataLayer[]>([])
@@ -50,17 +55,23 @@ function NewMapContentEnhanced() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    const loadProjects = async () => {
-      const data = await getAllProjects()
-      setProjects(data)
-      if (data.length > 0) {
-        const firstProject = data[0]
+    const loadData = async () => {
+      const [projectsData, layersData] = await Promise.all([
+        getAllProjects(),
+        getAllSharedLayers(),
+      ])
+
+      setProjects(projectsData)
+      setSharedLayers(layersData)
+
+      if (projectsData.length > 0) {
+        const firstProject = projectsData[0]
         if (firstProject) {
           setFormData(prev => ({ ...prev, project_id: firstProject.id }))
         }
       }
     }
-    loadProjects()
+    loadData()
   }, [])
 
   const validate = () => {
@@ -201,7 +212,7 @@ function NewMapContentEnhanced() {
       }
 
       // Create map record
-      const { error } = await createMap({
+      const { data: newMap, error } = await createMap({
         project_id: formData.project_id,
         name: formData.name.trim(),
         url_slug: formData.url_slug.trim(),
@@ -210,15 +221,66 @@ function NewMapContentEnhanced() {
         is_active: true,
       })
 
-      if (error) {
-        toast({ title: 'Error', description: error, variant: 'destructive' })
+      if (error || !newMap) {
+        toast({
+          title: 'Error',
+          description: error || 'Failed to create map',
+          variant: 'destructive',
+        })
         setLoading(false)
         return
       }
 
+      // Create map_layers records for custom maps
+      if (mapType === 'custom') {
+        const mapLayersToCreate = []
+        let sortOrder = 0
+
+        // Add shared layers
+        Array.from(selectedSharedLayers).forEach(sharedLayerId => {
+          const layer = sharedLayers.find(l => l.id === sharedLayerId)
+          if (layer) {
+            mapLayersToCreate.push({
+              map_id: newMap.id,
+              shared_layer_id: sharedLayerId,
+              display_label: layer.name,
+              layer_type: layer.layer_type,
+              is_visible: true,
+              sort_order: sortOrder++,
+            })
+          }
+        })
+
+        // Add custom uploaded layers
+        const projectSlug = generateProjectSlug(project.name)
+        for (const layer of dataLayers) {
+          mapLayersToCreate.push({
+            map_id: newMap.id,
+            custom_file_path: `map-data/${projectSlug}/${layer.fileName}`,
+            display_label: layer.label || layer.fileName,
+            layer_type: 'custom',
+            is_visible: true,
+            sort_order: sortOrder++,
+          })
+        }
+
+        // Create all map_layers records
+        if (mapLayersToCreate.length > 0) {
+          const { error: layersError } =
+            await createMapLayers(mapLayersToCreate)
+          if (layersError) {
+            toast({
+              title: 'Warning',
+              description: `Map created but failed to associate layers: ${layersError}`,
+              variant: 'destructive',
+            })
+          }
+        }
+      }
+
       const successMessage =
         mapType === 'custom'
-          ? `Map created! ${dataLayers.length > 0 ? `${dataLayers.length} layer(s) uploaded. ` : ''}Register "${formData.component_name}" in [slug].tsx`
+          ? `Map created! ${selectedSharedLayers.size + dataLayers.length} layer(s) configured. ${dataLayers.length > 0 ? `Custom files uploaded. ` : ''}Register "${formData.component_name}" in [slug].tsx`
           : `Map "${formData.name}" has been created.`
 
       toast({
@@ -462,7 +524,104 @@ function NewMapContentEnhanced() {
               {/* Custom Component Section */}
               {mapType === 'custom' && (
                 <>
-                  {/* Data Layer Upload */}
+                  {/* Shared Layers Selection */}
+                  {sharedLayers.length > 0 && (
+                    <div className='p-4 space-y-4 border-2 rounded-xl border-blue-200 bg-blue-50'>
+                      <div className='flex items-start'>
+                        <svg
+                          className='w-5 h-5 mr-3 text-blue-600 shrink-0'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
+                          />
+                        </svg>
+                        <div>
+                          <p className='text-sm font-medium text-blue-900'>
+                            Shared Layers
+                          </p>
+                          <p className='text-xs text-blue-700'>
+                            Select from existing shared layers that can be
+                            reused across multiple maps
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className='max-h-64 overflow-y-auto space-y-2'>
+                        {sharedLayers.map(layer => (
+                          <label
+                            key={layer.id}
+                            className='flex items-start p-3 bg-white border rounded-lg cursor-pointer border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-colors'
+                          >
+                            <input
+                              type='checkbox'
+                              checked={selectedSharedLayers.has(layer.id)}
+                              onChange={e => {
+                                const newSelected = new Set(
+                                  selectedSharedLayers
+                                )
+                                if (e.target.checked) {
+                                  newSelected.add(layer.id)
+                                } else {
+                                  newSelected.delete(layer.id)
+                                }
+                                setSelectedSharedLayers(newSelected)
+                              }}
+                              className='mt-1 mr-3'
+                            />
+                            <div className='flex-1'>
+                              <p className='text-sm font-medium text-slate-900'>
+                                {layer.name}
+                              </p>
+                              {layer.description && (
+                                <p className='mt-1 text-xs text-slate-600'>
+                                  {layer.description}
+                                </p>
+                              )}
+                              <div className='flex gap-3 mt-1 text-xs text-slate-500'>
+                                {layer.layer_type && (
+                                  <span className='px-2 py-0.5 bg-slate-100 rounded capitalize'>
+                                    {layer.layer_type}
+                                  </span>
+                                )}
+                                {layer.layer_source_type === 'file' &&
+                                  layer.feature_count && (
+                                    <span>
+                                      {layer.feature_count.toLocaleString()}{' '}
+                                      features
+                                    </span>
+                                  )}
+                                {layer.layer_source_type === 'url' &&
+                                  layer.tile_layer_type && (
+                                    <span>
+                                      {layer.tile_layer_type.toUpperCase()}{' '}
+                                      tiles
+                                    </span>
+                                  )}
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+
+                      {selectedSharedLayers.size > 0 && (
+                        <div className='pt-2 border-t border-blue-200'>
+                          <p className='text-sm font-medium text-blue-900'>
+                            {selectedSharedLayers.size} layer
+                            {selectedSharedLayers.size !== 1 ? 's' : ''}{' '}
+                            selected
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Custom Data Layer Upload */}
                   <div className='p-4 space-y-4 border-2 border-dashed rounded-xl border-slate-300 bg-slate-50'>
                     <div className='flex items-start'>
                       <svg
@@ -480,10 +639,10 @@ function NewMapContentEnhanced() {
                       </svg>
                       <div>
                         <p className='text-sm font-medium text-slate-900'>
-                          Data Layers (Optional)
+                          Custom Data Layers (Optional)
                         </p>
                         <p className='text-xs text-slate-600'>
-                          Upload GeoJSON files. Saved to: map-data/
+                          Upload map-specific GeoJSON files. Saved to: map-data/
                           {generateProjectSlug(
                             projects.find(p => p.id === formData.project_id)
                               ?.name || 'project'

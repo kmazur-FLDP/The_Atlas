@@ -37,6 +37,46 @@ export interface Map {
   project?: Project
 }
 
+export interface SharedLayer {
+  id: string
+  name: string
+  description?: string
+  layer_source_type: 'file' | 'url'
+  file_path?: string // For file-based layers
+  tile_url?: string // For URL-based tile layers
+  tile_layer_type?: 'xyz' | 'wms' | 'wmts' | 'vector' // Tile format
+  layer_type?: string
+  file_size?: number
+  feature_count?: number
+  created_by?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface MapLayer {
+  id: string
+  map_id: string
+  shared_layer_id?: string
+  custom_file_path?: string
+  display_label: string
+  layer_type?: string
+  is_visible: boolean
+  sort_order: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  style_overrides?: Record<string, any>
+  created_at: string
+  // Populated from joins
+  shared_layer?: SharedLayer
+}
+
+export interface MapLayerDetailed extends MapLayer {
+  shared_layer_name?: string
+  shared_file_path?: string
+  shared_description?: string
+  effective_file_path: string
+  source_type: 'shared' | 'custom'
+}
+
 export interface ProjectAccess {
   id: string
   project_id: string
@@ -84,6 +124,7 @@ export interface AuthUser {
   id: string
   email?: string
   user_metadata?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any
   }
 }
