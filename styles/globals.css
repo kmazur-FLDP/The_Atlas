@@ -143,22 +143,27 @@ html {
 
 /* Card hover effects */
 .card-hover {
-  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  @apply transition-shadow duration-200 hover:shadow-md;
 }
 
-/* Glass + glow utilities */
+/* Glass + glow utilities - simplified for better readability */
 .glass-panel {
-  @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-brand-primary/10;
+  @apply bg-white border border-slate-200/70 shadow-sm;
 }
 
 .glass-panel-dark {
-  @apply bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl shadow-brand-primary/20;
+  @apply bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl;
+}
+
+/* Glass header - keep blur only for navigation */
+.glass-header {
+  @apply bg-white/85 backdrop-blur-lg border border-white/40 shadow-lg;
 }
 
 .glow-ring {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 25px 50px -12px rgba(10, 61, 98, 0.3);
+    0 8px 16px -4px rgba(10, 61, 98, 0.08);
 }
 
 .text-gradient-brand {

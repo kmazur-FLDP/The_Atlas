@@ -140,7 +140,7 @@ export default function LoginPage() {
               </p>
             </div>
             <div className='grid gap-4 text-sm text-white/70'>
-              <div className='flex items-center gap-3 rounded-3xl border border-white/20 bg-white/10 px-5 py-4'>
+              <div className='flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4'>
                 <span className='inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white'>
                   <svg
                     className='h-4 w-4'
@@ -158,7 +158,7 @@ export default function LoginPage() {
                 </span>
                 Enterprise-grade security powered by Supabase
               </div>
-              <div className='flex items-center gap-3 rounded-3xl border border-white/20 bg-white/10 px-5 py-4'>
+              <div className='flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4'>
                 <span className='inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white'>
                   <svg
                     className='h-4 w-4'
@@ -179,23 +179,25 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Card className='glass-panel relative z-10 w-full max-w-lg overflow-hidden rounded-4xl border border-white/40 shadow-[0_35px_65px_rgba(10,61,98,0.22)] lg:max-w-md'>
+          <Card className='relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-white/40 bg-white shadow-md lg:max-w-md'>
             <CardHeader className='space-y-6 pb-2 text-center'>
               <div className='mx-auto flex items-center justify-center'>
-                <Image
-                  src='/images/fldp_final_color.png'
-                  alt='FLDP Logo'
-                  width={240}
-                  height={72}
-                  className='h-16 w-auto drop-shadow-xl'
-                  priority
-                />
+                <div className='rounded-xl bg-white px-4 py-2 shadow-sm'>
+                  <Image
+                    src='/images/fldp_final_color.png'
+                    alt='FLDP Logo'
+                    width={240}
+                    height={72}
+                    className='h-14 w-auto'
+                    priority
+                  />
+                </div>
               </div>
               <div className='space-y-2'>
-                <CardTitle className='text-3xl font-semibold text-slate-900'>
+                <CardTitle className='text-3xl font-bold text-slate-900'>
                   Sign in to your workspace
                 </CardTitle>
-                <CardDescription className='text-base text-slate-600'>
+                <CardDescription className='text-base text-slate-600 leading-relaxed'>
                   Enter your credentials to access the FLDP Atlas control
                   center.
                 </CardDescription>
@@ -205,7 +207,7 @@ export default function LoginPage() {
             <CardContent className='space-y-5 pb-8'>
               <form onSubmit={handleSubmit} className='space-y-5'>
                 {errors.general && (
-                  <div className='rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3 text-sm text-red-700 shadow-sm'>
+                  <div className='rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
                     {errors.general}
                   </div>
                 )}
@@ -264,7 +266,7 @@ export default function LoginPage() {
 
                 <Button
                   type='submit'
-                  className='w-full rounded-full bg-brand-primary py-3 text-base font-semibold tracking-wide text-white shadow-lg shadow-brand-primary/25 transition hover:bg-brand-primary-dark hover:shadow-xl'
+                  className='w-full rounded-xl bg-brand-primary py-3 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md'
                   disabled={isLoading}
                 >
                   {isLoading ? (

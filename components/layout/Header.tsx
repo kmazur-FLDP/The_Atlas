@@ -28,6 +28,7 @@ export function Header() {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', show: isAuthenticated },
+    { name: 'Projects', href: '/projects', show: isAuthenticated },
     { name: 'Maps', href: '/maps', show: isAuthenticated },
     { name: 'Admin', href: '/admin', show: isAdmin },
   ].filter(item => item.show)

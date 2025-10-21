@@ -29,6 +29,15 @@ module.exports = {
           'accent-dark': '#2980b9',
           'accent-light': '#5dade2',
         },
+        // Neutral palette for backgrounds and borders
+        neutral: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
