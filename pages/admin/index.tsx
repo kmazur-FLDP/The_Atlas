@@ -124,23 +124,13 @@ function AdminDashboardContent() {
     }
   }
 
+  // Load data on mount and whenever we navigate to this page
   useEffect(() => {
-    fetchStats()
-  }, [])
-
-  // Reload data when navigating back to this page
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url === '/admin') {
-        fetchStats()
-      }
+    if (router.isReady) {
+      fetchStats()
     }
-
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.asPath])
 
   const statDefinitions: Array<{
     key: StatKey

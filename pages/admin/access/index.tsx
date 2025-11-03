@@ -58,23 +58,13 @@ function AccessControlContent() {
     setLoading(false)
   }
 
+  // Load data on mount and whenever we navigate to this page
   useEffect(() => {
-    loadData()
-  }, [])
-
-  // Reload data when navigating back to this page
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url === '/admin/access') {
-        loadData()
-      }
+    if (router.isReady) {
+      loadData()
     }
-
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.asPath])
 
   const handleAssign = async () => {
     if (!selectedCompany || !selectedProject) {

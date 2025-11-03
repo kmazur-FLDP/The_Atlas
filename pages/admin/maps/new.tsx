@@ -54,47 +54,30 @@ function NewMapContentEnhanced() {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    const loadData = async () => {
-      const [projectsData, layersData] = await Promise.all([
-        getAllProjects(),
-        getAllSharedLayers(),
-      ])
+  const loadData = async () => {
+    const [projectsData, layersData] = await Promise.all([
+      getAllProjects(),
+      getAllSharedLayers(),
+    ])
 
-      setProjects(projectsData)
-      setSharedLayers(layersData)
+    setProjects(projectsData)
+    setSharedLayers(layersData)
 
-      if (projectsData.length > 0) {
-        const firstProject = projectsData[0]
-        if (firstProject) {
-          setFormData(prev => ({ ...prev, project_id: firstProject.id }))
-        }
+    if (projectsData.length > 0) {
+      const firstProject = projectsData[0]
+      if (firstProject) {
+        setFormData(prev => ({ ...prev, project_id: firstProject.id }))
       }
     }
-    loadData()
-  }, [])
+  }
 
-  // Reload data when navigating back to this page
+  // Load data on mount and whenever we navigate to this page
   useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url === '/admin/maps/new') {
-        const loadData = async () => {
-          const [projectsData, layersData] = await Promise.all([
-            getAllProjects(),
-            getAllSharedLayers(),
-          ])
-          setProjects(projectsData)
-          setSharedLayers(layersData)
-        }
-        loadData()
-      }
+    if (router.isReady) {
+      loadData()
     }
-
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.asPath])
 
   const validate = () => {
     const newErrors: Record<string, string> = {}

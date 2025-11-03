@@ -22,24 +22,6 @@ function SharedLayersContent() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [usageCounts, setUsageCounts] = useState<Record<string, number>>({})
 
-  useEffect(() => {
-    loadLayers()
-  }, [])
-
-  // Reload data when navigating back to this page
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url === '/admin/layers') {
-        loadLayers()
-      }
-    }
-
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
-
   async function loadLayers() {
     setLoading(true)
     const data = await getAllSharedLayers()
@@ -54,6 +36,14 @@ function SharedLayersContent() {
 
     setLoading(false)
   }
+
+  // Load data on mount and whenever we navigate to this page
+  useEffect(() => {
+    if (router.isReady) {
+      loadLayers()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.asPath])
 
   async function handleDelete(id: string, name: string) {
     const usageCount = usageCounts[id] || 0
