@@ -8,6 +8,7 @@ import { getAllProjects } from '@/lib/supabase/projects'
 import { getAllUsers } from '@/lib/supabase/users'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 type StatKey = 'companies' | 'users' | 'projects' | 'maps'
@@ -92,6 +93,7 @@ const icons: Record<IconKey, (className: string) => JSX.Element> = {
 }
 
 function AdminDashboardContent() {
+  const router = useRouter()
   const [stats, setStats] = useState<Record<StatKey, number>>({
     companies: 0,
     users: 0,
@@ -100,31 +102,45 @@ function AdminDashboardContent() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [companies, users, projects, maps] = await Promise.all([
-          getAllCompanies(),
-          getAllUsers(),
-          getAllProjects(),
-          getAllMaps(),
-        ])
+  const fetchStats = async () => {
+    try {
+      const [companies, users, projects, maps] = await Promise.all([
+        getAllCompanies(),
+        getAllUsers(),
+        getAllProjects(),
+        getAllMaps(),
+      ])
 
-        setStats({
-          companies: companies.length,
-          users: users.length,
-          projects: projects.length,
-          maps: maps.length,
-        })
-      } catch (error) {
-        // Handle error
-      } finally {
-        setLoading(false)
+      setStats({
+        companies: companies.length,
+        users: users.length,
+        projects: projects.length,
+        maps: maps.length,
+      })
+    } catch (error) {
+      // Handle error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin') {
+        fetchStats()
       }
     }
 
-    fetchStats()
-  }, [])
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const statDefinitions: Array<{
     key: StatKey

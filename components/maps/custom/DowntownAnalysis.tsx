@@ -4,7 +4,7 @@ import { LayerControl } from '@/components/maps/LayerControl'
 import { MapLegend } from '@/components/maps/MapLegend'
 import { PARCEL_STYLES, ZONING_COLORS } from '@/lib/mapConstants'
 import { supabase } from '@/lib/supabase/client'
-import type { Map as MapType } from '@/types'
+import type { MapLayerDetailed, Map as MapType } from '@/types'
 import type { Feature, GeoJsonObject } from 'geojson'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -13,6 +13,7 @@ import { GeoJSON } from 'react-leaflet'
 
 interface DowntownAnalysisProps {
   mapData: MapType
+  mapLayers?: MapLayerDetailed[]
 }
 
 interface ParcelProperties {
@@ -25,7 +26,10 @@ interface ParcelProperties {
   [key: string]: any
 }
 
-export default function DowntownAnalysis({ mapData }: DowntownAnalysisProps) {
+export default function DowntownAnalysis({
+  mapData,
+  mapLayers = [],
+}: DowntownAnalysisProps) {
   const router = useRouter()
   const [parcels, setParcels] = useState<GeoJsonObject | null>(null)
   const [zoning, setZoning] = useState<GeoJsonObject | null>(null)
@@ -39,37 +43,93 @@ export default function DowntownAnalysis({ mapData }: DowntownAnalysisProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadMapData()
-  }, [])
+    async function loadDynamicMapData() {
+      setLoading(true)
+      try {
+        const layerData: Record<string, GeoJsonObject> = {}
+        const layerControls = mapLayers
+          .filter(ml => ml.is_visible)
+          .map((ml, index) => ({
+            id: ml.id,
+            name: ml.display_label,
+            visible: ml.is_visible,
+            sortOrder: ml.sort_order || index,
+          }))
+          .sort((a, b) => a.sortOrder - b.sortOrder)
 
-  async function loadMapData() {
-    setLoading(true)
-    try {
-      // Load GeoJSON from Supabase Storage
-      // Adjust paths based on your storage structure
-      const { data: parcelData } = await supabase.storage
-        .from('map-data')
-        .download('downtown/parcels.geojson')
+        // Load all layers
+        for (const layer of mapLayers) {
+          if (!layer.effective_file_path) continue
 
-      const { data: zoningData } = await supabase.storage
-        .from('map-data')
-        .download('downtown/zoning.geojson')
+          try {
+            const { data } = await supabase.storage
+              .from('project-files')
+              .download(layer.effective_file_path)
 
-      if (parcelData) {
-        const parcelText = await parcelData.text()
-        setParcels(JSON.parse(parcelText))
+            if (data) {
+              const text = await data.text()
+              const geojson = JSON.parse(text)
+              layerData[layer.id] = geojson
+
+              // For backwards compatibility, also set parcels/zoning if they match
+              if (layer.display_label.toLowerCase().includes('parcel')) {
+                setParcels(geojson)
+              } else if (layer.display_label.toLowerCase().includes('zoning')) {
+                setZoning(geojson)
+              }
+            }
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(`Failed to load layer ${layer.display_label}:`, err)
+          }
+        }
+
+        setLayers(layerControls)
+      } catch (error) {
+        // Error loading data
+        // eslint-disable-next-line no-console
+        console.error('Error loading dynamic map data:', error)
+      } finally {
+        setLoading(false)
       }
-
-      if (zoningData) {
-        const zoningText = await zoningData.text()
-        setZoning(JSON.parse(zoningText))
-      }
-    } catch (error) {
-      // Error loading data - will show empty map
-    } finally {
-      setLoading(false)
     }
-  }
+
+    async function loadMapData() {
+      setLoading(true)
+      try {
+        // Load GeoJSON from Supabase Storage
+        // Adjust paths based on your storage structure
+        const { data: parcelData } = await supabase.storage
+          .from('map-data')
+          .download('downtown/parcels.geojson')
+
+        const { data: zoningData } = await supabase.storage
+          .from('map-data')
+          .download('downtown/zoning.geojson')
+
+        if (parcelData) {
+          const parcelText = await parcelData.text()
+          setParcels(JSON.parse(parcelText))
+        }
+
+        if (zoningData) {
+          const zoningText = await zoningData.text()
+          setZoning(JSON.parse(zoningText))
+        }
+      } catch (error) {
+        // Error loading data - will show empty map
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // Load data based on whether we have map layers
+    if (mapLayers.length > 0) {
+      loadDynamicMapData()
+    } else {
+      loadMapData()
+    }
+  }, [mapLayers])
 
   function handleLayerToggle(layerId: string) {
     setLayers(prev =>

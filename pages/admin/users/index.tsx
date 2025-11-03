@@ -18,9 +18,11 @@ import {
 } from '@/lib/supabase/users'
 import type { Company, User } from '@/types'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 function UsersContent() {
+  const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,6 +43,20 @@ function UsersContent() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/users') {
+        loadData()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const handleCompanyChange = async (userId: string, companyId: string) => {
     setUpdating(userId)

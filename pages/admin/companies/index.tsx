@@ -7,9 +7,11 @@ import { deleteCompany, getCompaniesWithStats } from '@/lib/supabase/companies'
 import type { Company } from '@/types'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 function CompaniesContent() {
+  const router = useRouter()
   const [companies, setCompanies] = useState<
     Array<Company & { user_count: number }>
   >([])
@@ -27,6 +29,20 @@ function CompaniesContent() {
   useEffect(() => {
     loadCompanies()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/companies') {
+        loadCompanies()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const handleDelete = async (id: string, name: string) => {
     if (

@@ -2,7 +2,8 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase/client'
-import type { Map as MapType } from '@/types'
+import { getMapLayers } from '@/lib/supabase/layers'
+import type { MapLayerDetailed, Map as MapType } from '@/types'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -31,9 +32,21 @@ function MapViewerContent() {
   const { slug } = router.query
   const { user, profile } = useAuth()
   const [mapData, setMapData] = useState<MapData | null>(null)
+  const [mapLayers, setMapLayers] = useState<MapLayerDetailed[]>([])
   const [hasAccess, setHasAccess] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const loadMapLayers = async (mapId: string) => {
+    try {
+      const layers = await getMapLayers(mapId)
+      setMapLayers(layers)
+    } catch (err) {
+      // Error loading layers - map will work without layers
+      // eslint-disable-next-line no-console
+      console.error('Failed to load map layers:', err)
+    }
+  }
 
   const checkAccessAndLoadMap = useCallback(
     async (mapSlug: string) => {
@@ -68,6 +81,7 @@ function MapViewerContent() {
           setMapData(map)
           setHasAccess(true)
           setLoading(false)
+          loadMapLayers(map.id)
           return
         }
 
@@ -86,6 +100,7 @@ function MapViewerContent() {
 
         setMapData(map)
         setHasAccess(true)
+        loadMapLayers(map.id)
       } catch (err) {
         setError('An error occurred while loading the map')
         // Log error for debugging
@@ -168,7 +183,7 @@ function MapViewerContent() {
           <title>{mapData.name} - The Atlas</title>
           <meta name='description' content={mapData.description || ''} />
         </Head>
-        <CustomComponent mapData={mapData} />
+        <CustomComponent mapData={mapData} mapLayers={mapLayers} />
       </>
     )
   }

@@ -11,9 +11,11 @@ import {
 import type { SharedLayer } from '@/types'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 function SharedLayersContent() {
+  const router = useRouter()
   const { toast } = useToast()
   const [layers, setLayers] = useState<SharedLayer[]>([])
   const [loading, setLoading] = useState(true)
@@ -23,6 +25,20 @@ function SharedLayersContent() {
   useEffect(() => {
     loadLayers()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/layers') {
+        loadLayers()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   async function loadLayers() {
     setLoading(true)

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase/client'
-import { getAllSharedLayers, createMapLayers } from '@/lib/supabase/layers'
+import { createMapLayers, getAllSharedLayers } from '@/lib/supabase/layers'
 import { createMap } from '@/lib/supabase/maps'
 import { getAllProjects } from '@/lib/supabase/projects'
 import type { Project, SharedLayer } from '@/types'
@@ -73,6 +73,28 @@ function NewMapContentEnhanced() {
     }
     loadData()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/maps/new') {
+        const loadData = async () => {
+          const [projectsData, layersData] = await Promise.all([
+            getAllProjects(),
+            getAllSharedLayers(),
+          ])
+          setProjects(projectsData)
+          setSharedLayers(layersData)
+        }
+        loadData()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const validate = () => {
     const newErrors: Record<string, string> = {}

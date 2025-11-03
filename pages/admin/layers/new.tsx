@@ -189,6 +189,9 @@ function NewSharedLayerContent() {
           title: 'Success',
           description: `"${formData.name}" has been uploaded and is now available as a shared layer.`,
         })
+
+        setLoading(false)
+        router.push('/admin/layers')
       } else {
         // Create database record for URL-based tile layer
         const { error: dbError } = await createSharedLayer({
@@ -214,9 +217,10 @@ function NewSharedLayerContent() {
           title: 'Success',
           description: `"${formData.name}" tile layer has been added as a shared layer.`,
         })
-      }
 
-      router.push('/admin/layers')
+        setLoading(false)
+        router.push('/admin/layers')
+      }
     } catch (error) {
       toast({
         title: 'Error',

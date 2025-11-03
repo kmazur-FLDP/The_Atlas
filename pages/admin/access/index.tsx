@@ -25,6 +25,7 @@ import { getAllCompanies } from '@/lib/supabase/companies'
 import { getAllProjects } from '@/lib/supabase/projects'
 import type { Company, Project, ProjectAccess } from '@/types'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 interface ProjectAccessWithDetails extends ProjectAccess {
@@ -33,6 +34,7 @@ interface ProjectAccessWithDetails extends ProjectAccess {
 }
 
 function AccessControlContent() {
+  const router = useRouter()
   const [access, setAccess] = useState<ProjectAccessWithDetails[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
   const [projects, setProjects] = useState<Project[]>([])
@@ -59,6 +61,20 @@ function AccessControlContent() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/access') {
+        loadData()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const handleAssign = async () => {
     if (!selectedCompany || !selectedProject) {

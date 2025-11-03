@@ -9,9 +9,11 @@ import { getAllProjects } from '@/lib/supabase/projects'
 import type { Map, Project } from '@/types'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 function MapsContent() {
+  const router = useRouter()
   const [maps, setMaps] = useState<Map[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -32,6 +34,20 @@ function MapsContent() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/maps') {
+        loadData()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return

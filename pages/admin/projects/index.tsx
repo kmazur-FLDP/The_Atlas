@@ -13,9 +13,11 @@ import { deleteProject, getProjectsWithStats } from '@/lib/supabase/projects'
 import type { Project } from '@/types'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 function ProjectsContent() {
+  const router = useRouter()
   const [projects, setProjects] = useState<
     Array<Project & { map_count: number; company_count: number }>
   >([])
@@ -33,6 +35,20 @@ function ProjectsContent() {
   useEffect(() => {
     loadProjects()
   }, [])
+
+  // Reload data when navigating back to this page
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url === '/admin/projects') {
+        loadProjects()
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
 
   const handleDelete = async (id: string, name: string) => {
     if (
